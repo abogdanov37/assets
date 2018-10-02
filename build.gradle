@@ -1,0 +1,101 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
+        classpath 'org.postgresql:postgresql:42.2.5'
+
+        classpath 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+        classpath 'com.sun.xml.bind:jaxb-impl:2.3.0.1'
+        classpath 'javax.activation:activation:1.1.1'
+        classpath 'javax.xml.bind:jaxb-api:2.3.0'
+
+    }
+}
+
+plugins {
+    id 'nu.studer.jooq' version '3.0.2'
+    id "org.flywaydb.flyway" version "5.1.4"
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'idea'
+apply plugin: 'io.spring.dependency-management'
+
+group 'Assets'
+version '1.0'
+
+sourceCompatibility = 1.9
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-jooq'
+    compile 'org.jooq:jooq'
+    compile 'org.postgresql:postgresql:42.2.5'
+    testCompile 'junit:junit:4.12'
+
+    jooqRuntime 'org.postgresql:postgresql:42.2.5'
+    jooqRuntime 'javax.activation:activation:1.1.1'
+    jooqRuntime 'javax.xml.bind:jaxb-api:2.3.0'
+    jooqRuntime 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    jooqRuntime 'com.sun.xml.bind:jaxb-impl:2.3.0.1'
+}
+
+flyway {
+    url = 'jdbc:postgresql://localhost:5432/asset'
+    user = 'asset'
+    password = 'asset'
+    schemas = ['asset']
+    locations = ["filesystem:$project.projectDir/src/main/resources/db/migration"]
+}
+
+jooq {
+    version = '3.11.2'
+    edition = 'OSS'
+    assets(sourceSets.main) {
+        jdbc {
+            driver = 'org.postgresql.Driver'
+            url = 'jdbc:postgresql://localhost:5432/asset'
+            user = 'asset'
+            password = 'asset'
+        }
+        generator {
+            name = 'org.jooq.codegen.DefaultGenerator'
+            strategy {
+                name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+            }
+            database {
+                name = 'org.jooq.meta.postgres.PostgresDatabase'
+                inputSchema = 'asset'
+                forcedTypes {
+                }
+            }
+            generate {
+                relations = true
+                deprecated = false
+                records = true
+                immutablePojos = true
+                fluentSetters = true
+            }
+            target {
+                packageName = 'com.assets.model'
+            }
+        }
+    }
+}
+
+ext['jooq.version'] = '3.11.2'
+
+task run(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.assets.Assets'
+}
+
+generateAssetsJooqSchemaSource.dependsOn flywayMigrate
+//test.dependsOn flywayClean
