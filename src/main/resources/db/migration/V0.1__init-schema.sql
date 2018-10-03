@@ -10,20 +10,20 @@ CREATE TABLE attributes (
     value character varying(200)
 );
 
-ALTER TABLE ONLY assets
+ALTER TABLE assets
     ADD CONSTRAINT assets_pk PRIMARY KEY (id);
 
-ALTER TABLE ONLY attributes
+ALTER TABLE attributes
     ADD CONSTRAINT attributes_pk PRIMARY KEY (id);
 
-ALTER TABLE ONLY assets
-    ADD CONSTRAINT assets_parentid_fk FOREIGN KEY (parentid) REFERENCES assets(id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;	
+ALTER TABLE assets
+    ADD CONSTRAINT assets_parentid_fk FOREIGN KEY (parentid) REFERENCES assets(id) ON DELETE CASCADE;
 	
-ALTER TABLE ONLY attributes
-    ADD CONSTRAINT attributes_assetid_fk FOREIGN KEY (assetid) REFERENCES assets(id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;	
+ALTER TABLE attributes
+    ADD CONSTRAINT attributes_assetid_fk FOREIGN KEY (assetid) REFERENCES assets(id) ON DELETE CASCADE;
 	
-CREATE UNIQUE INDEX assets_id_idx ON assets USING btree (id);
-CREATE INDEX assets_parentid_idx ON assets USING btree (parentid);
+CREATE UNIQUE INDEX assets_id_idx ON assets(id);
+CREATE INDEX assets_parentid_idx ON assets(parentid);
 
-CREATE UNIQUE INDEX attributes_id_idx ON attributes USING btree (id);
-CREATE INDEX attributes_assetid_idx ON attributes USING btree (assetid);
+CREATE UNIQUE INDEX attributes_id_idx ON attributes(id);
+CREATE INDEX attributes_assetid_idx ON attributes(assetid);

@@ -4,7 +4,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
-        classpath 'org.postgresql:postgresql:42.2.5'
+        classpath 'com.h2database:h2:1.4.197'
 
         classpath 'com.sun.xml.bind:jaxb-core:2.3.0.1'
         classpath 'com.sun.xml.bind:jaxb-impl:2.3.0.1'
@@ -37,10 +37,10 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-jooq'
     compile 'org.jooq:jooq'
-    compile 'org.postgresql:postgresql:42.2.5'
+    runtime 'com.h2database:h2:1.4.197'
     testCompile 'junit:junit:4.12'
 
-    jooqRuntime 'org.postgresql:postgresql:42.2.5'
+    jooqRuntime 'com.h2database:h2:1.4.197'
     jooqRuntime 'javax.activation:activation:1.1.1'
     jooqRuntime 'javax.xml.bind:jaxb-api:2.3.0'
     jooqRuntime 'com.sun.xml.bind:jaxb-core:2.3.0.1'
@@ -48,7 +48,7 @@ dependencies {
 }
 
 flyway {
-    url = 'jdbc:postgresql://localhost:5432/asset'
+    url = 'jdbc:h2:~/test'
     user = 'asset'
     password = 'asset'
     schemas = ['asset']
@@ -60,8 +60,8 @@ jooq {
     edition = 'OSS'
     assets(sourceSets.main) {
         jdbc {
-            driver = 'org.postgresql.Driver'
-            url = 'jdbc:postgresql://localhost:5432/asset'
+            driver = 'org.h2.Driver'
+            url = 'jdbc:h2:~/test'
             user = 'asset'
             password = 'asset'
         }
@@ -71,7 +71,7 @@ jooq {
                 name = 'org.jooq.codegen.DefaultGeneratorStrategy'
             }
             database {
-                name = 'org.jooq.meta.postgres.PostgresDatabase'
+                name = 'org.jooq.meta.h2.H2Database'
                 inputSchema = 'asset'
                 forcedTypes {
                 }

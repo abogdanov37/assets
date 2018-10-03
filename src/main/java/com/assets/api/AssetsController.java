@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,17 +56,17 @@ public class AssetsController {
             , produces="application/json;charset=UTF-8")
     public ResponseEntity<List<Asset>> getSubTree(@PathVariable("id") long id) {
         Result<Record> result = context
-                .fetch("WITH RECURSIVE tree AS ( \n" +
+                .fetch("WITH RECURSIVE tree(id, name, parentid) AS ( \n" +
                         " SELECT a.id, a.name, a.parentid \n" +
-                        " FROM assets a\n" +
+                        " FROM \"asset\".\"ASSETS\" a\n" +
                         " WHERE a.id = ? \n" +
-                        " UNION \n" +
+                        " UNION ALL \n" +
                         " SELECT aa.id, aa.name, aa.parentid \n" +
-                        " FROM assets aa \n" +
-                        " INNER JOIN tree t ON t.id = aa.parentid \n" +
+                        " FROM tree t \n" +
+                        " INNER JOIN \"asset\".\"ASSETS\" aa ON t.id = aa.parentid \n" +
                         ") SELECT r.id, r.name, r.parentid, atr.name, atr.value \n" +
                         "FROM tree r\n" +
-                        "LEFT OUTER JOIN attributes atr on atr.assetid = r.id \n" +
+                        "LEFT OUTER JOIN \"asset\".\"ATTRIBUTES\" atr on atr.assetid = r.id \n" +
                         "ORDER BY r.parentid;", id);
 
         if (result.size() > 0) {
@@ -74,13 +75,13 @@ public class AssetsController {
             List<Asset> body = new ArrayList<>();
             for (Record r : result) {
                 if (previous == null
-                        || previous.getValue(Assets.ASSETS.ID).longValue() != r.getValue(Assets.ASSETS.ID).longValue()) {
+                        || previous.getValue("ID", BigDecimal.class).longValue() != r.getValue("ID", BigDecimal.class).longValue()) {
                     if (asset != null) {
                         body.add(asset);
                     }
-                    asset = new Asset(r.getValue(Assets.ASSETS.ID).longValue(),
+                    asset = new Asset(r.getValue("ID", BigDecimal.class).longValue(),
                             r.getValue(Assets.ASSETS.NAME),
-                            r.getValue(Assets.ASSETS.PARENTID) != null
+                            r.getValue("PARENTID", BigDecimal.class) != null
                                     ? r.getValue(Assets.ASSETS.PARENTID).longValue()
                                     : null,
                             new HashMap<>());
