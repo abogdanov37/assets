@@ -1,0 +1,29 @@
+server:
+  port: 8085
+
+spring:
+  datasource:
+    validation-query: SELECT 1
+    max-active: 10
+    max-idle: 8
+    min-idle: 8
+    initial-size: 5
+    test-on-borrow: true
+    test-on-return: true
+    url: "jdbc:h2:~/test"
+    driver-class-name: org.h2.Driver
+    username: asset
+    password: asset
+
+logging:
+  config: "classpath:log4j2prod.xml"
+
+jooq:
+  sql:
+    dialect: H2
+
+pool:
+  bio:
+    core-size: 10
+    max-size: 50
+    alive-time: 180

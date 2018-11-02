@@ -9,6 +9,7 @@ import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -16,6 +17,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 
@@ -31,24 +34,27 @@ public class AssetsController {
     @RequestMapping(value = "/assets/{id}"
             , method = RequestMethod.GET
             , produces="application/json;charset=UTF-8")
-    public ResponseEntity<Asset> getAsset(@PathVariable("id") long id) {
-        Result<Record> result = context.select().from(Assets.ASSETS)
+    @Async
+    public CompletableFuture<ResponseEntity<Asset>> getAsset(@PathVariable("id") long id) {
+        CompletionStage<Result<Record>> result = context.select().from(Assets.ASSETS)
                 .join(Attributes.ATTRIBUTES)
                 .on(Attributes.ATTRIBUTES.ASSETID.eq(Assets.ASSETS.ID))
                 .where(Assets.ASSETS.ID.eq(BigInteger.valueOf(id)))
-                .fetch();
-        if (result.size() > 0) {
-            Asset asset = new Asset(result.get(0).getValue(Assets.ASSETS.ID).longValue(),
-                    result.get(0).getValue(Assets.ASSETS.NAME),
-                    result.get(0).getValue(Assets.ASSETS.PARENTID) != null
-                            ? result.get(0).getValue(Assets.ASSETS.PARENTID).longValue()
-                            : null,
-                    result.stream().collect(
-                            Collectors.toMap(r -> r.getValue(Attributes.ATTRIBUTES.NAME)
-                                    , r -> r.getValue(Attributes.ATTRIBUTES.VALUE))));
-            return ResponseEntity.ok().body(asset);
-        }
-        return ResponseEntity.notFound().build();
+                .fetchAsync();
+        return result.toCompletableFuture().thenApply(records -> {
+            if (records.size() > 0) {
+                Asset asset = new Asset(records.get(0).getValue(Assets.ASSETS.ID).longValue(),
+                        records.get(0).getValue(Assets.ASSETS.NAME),
+                        records.get(0).getValue(Assets.ASSETS.PARENTID) != null
+                                ? records.get(0).getValue(Assets.ASSETS.PARENTID).longValue()
+                                : null,
+                        records.stream().collect(
+                                Collectors.toMap(r -> r.getValue(Attributes.ATTRIBUTES.NAME)
+                                        , r -> r.getValue(Attributes.ATTRIBUTES.VALUE))));
+                return ResponseEntity.ok().body(asset);
+            }
+            return ResponseEntity.notFound().build();
+        });
     }
 
     @RequestMapping(value = "/assets/{id}/subtree"

@@ -3,14 +3,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.6.RELEASE")
         classpath 'com.h2database:h2:1.4.197'
 
         classpath 'com.sun.xml.bind:jaxb-core:2.3.0.1'
         classpath 'com.sun.xml.bind:jaxb-impl:2.3.0.1'
         classpath 'javax.activation:activation:1.1.1'
         classpath 'javax.xml.bind:jaxb-api:2.3.0'
-
     }
 }
 
@@ -36,8 +35,10 @@ repositories {
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-jooq'
+    compile'org.springframework.boot:spring-boot-starter-log4j2'
     compile 'org.jooq:jooq'
     runtime 'com.h2database:h2:1.4.197'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'junit:junit:4.12'
 
     jooqRuntime 'com.h2database:h2:1.4.197'
@@ -45,6 +46,12 @@ dependencies {
     jooqRuntime 'javax.xml.bind:jaxb-api:2.3.0'
     jooqRuntime 'com.sun.xml.bind:jaxb-core:2.3.0.1'
     jooqRuntime 'com.sun.xml.bind:jaxb-impl:2.3.0.1'
+}
+
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 flyway {
@@ -98,4 +105,3 @@ task run(type: JavaExec) {
 }
 
 generateAssetsJooqSchemaSource.dependsOn flywayMigrate
-//test.dependsOn flywayClean

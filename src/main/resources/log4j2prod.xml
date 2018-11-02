@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <RollingRandomAccessFile name="JSONLogfileAppender" fileName="logs/app-log.json" filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.json.gz">
+            <JSONLayout compact="true" eventEol="true" properties="true" objectMessageAsJsonObject="true">
+                <KeyValuePair key="application" value="assets"/>
+            </JSONLayout>
+            <BurstFilter level="DEBUG" rate="2" maxBurst="10"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingRandomAccessFile>
+        <Async name="AsyncAppender" bufferSize="80">
+            <AppenderRef ref="JSONLogfileAppender"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Root level="TRACE">
+            <AppenderRef ref="AsyncAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
