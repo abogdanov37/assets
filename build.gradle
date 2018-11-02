@@ -38,8 +38,12 @@ dependencies {
     compile'org.springframework.boot:spring-boot-starter-log4j2'
     compile 'org.jooq:jooq'
     runtime 'com.h2database:h2:1.4.197'
+
     testCompile 'org.springframework.boot:spring-boot-starter-test'
-    testCompile 'junit:junit:4.12'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testCompile 'org.junit.vintage:junit-vintage-engine:5.3.1'
+    //testCompile 'org.junit:junit:5.3.1'
+    testCompile 'org.assertj:assertj-core:3.11.1'
 
     jooqRuntime 'com.h2database:h2:1.4.197'
     jooqRuntime 'javax.activation:activation:1.1.1'

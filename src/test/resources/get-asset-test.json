@@ -1,0 +1,66 @@
+{
+  "fields":[
+    {
+      "schema":"asset",
+      "table":"ASSETS",
+      "name":"ID",
+      "type":"DECIMAL_INTEGER"
+    },
+    {
+      "schema":"asset",
+      "table":"ASSETS",
+      "name":"NAME",
+      "type":"VARCHAR"
+    },
+    {
+      "schema":"asset",
+      "table":"ASSETS",
+      "name":"PARENTID",
+      "type":"DECIMAL_INTEGER"
+    },
+    {
+      "schema":"asset",
+      "table":"ATTRIBUTES",
+      "name":"ASSETID",
+      "type":"DECIMAL_INTEGER"
+    },
+    {
+      "schema":"asset",
+      "table":"ATTRIBUTES",
+      "name":"VALUE",
+      "type":"VARCHAR"
+    },
+    {
+      "schema":"asset",
+      "table":"ATTRIBUTES",
+      "name":"NAME",
+      "type":"VARCHAR"
+    }
+  ],
+  "records":[
+    [
+      1,
+      "Завод №1",
+      null,
+      1,
+      "Завод",
+      "Тип"
+    ],
+    [
+      1,
+      "Завод №1",
+      null,
+      1,
+      "Богданов А.А.",
+      "Руководитель"
+    ],
+    [
+      1,
+      "Завод №1",
+      null,
+      1,
+      "МАРС",
+      "Расположение"
+    ]
+  ]
+}
