@@ -15,7 +15,7 @@ buildscript {
 
 plugins {
     id 'nu.studer.jooq' version '3.0.2'
-    id "org.flywaydb.flyway" version "5.1.4"
+    id "org.flywaydb.flyway" version "5.2.1"
 }
 
 apply plugin: 'java'
@@ -26,7 +26,10 @@ apply plugin: 'io.spring.dependency-management'
 group 'Assets'
 version '1.0'
 
-sourceCompatibility = 1.9
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+sourceCompatibility = 1.10
 
 repositories {
     mavenCentral()
@@ -42,8 +45,8 @@ dependencies {
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testCompile 'org.junit.vintage:junit-vintage-engine:5.3.1'
-    //testCompile 'org.junit:junit:5.3.1'
     testCompile 'org.assertj:assertj-core:3.11.1'
+    testCompile 'org.flywaydb:flyway-core:5.2.1'
 
     jooqRuntime 'com.h2database:h2:1.4.197'
     jooqRuntime 'javax.activation:activation:1.1.1'

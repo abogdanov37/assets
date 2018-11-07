@@ -13,15 +13,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import java.util.concurrent.*;
+
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableTransactionManagement
 public class PersistenceConfiguration {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private DataSourceConnectionProvider connectionProvider;
     private Environment env;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public PersistenceConfiguration(DataSourceConnectionProvider connectionProvider, Environment env) {
         this.connectionProvider = connectionProvider;
@@ -30,7 +33,7 @@ public class PersistenceConfiguration {
 
     @Bean(name = "dsl")
     public DSLContext getDsl() {
-        DefaultExecuteListenerProvider listenerProvider = new DefaultExecuteListenerProvider(new JooqExceptionTranslator ());
+        DefaultExecuteListenerProvider listenerProvider = new DefaultExecuteListenerProvider(new JooqExceptionTranslator());
 
         DefaultConfiguration config = new DefaultConfiguration();
         config.setSQLDialect(SQLDialect.valueOf(env.getProperty("jooq.sql.dialect")));

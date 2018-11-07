@@ -1,0 +1,1 @@
+insert into assets values (1, 'Завод №1', null);

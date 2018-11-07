@@ -1,5 +1,6 @@
-package com.assets.api;
+package com.assets.controller;
 
+import com.assets.api.AssetsController;
 import com.assets.transfer.Asset;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -7,6 +8,7 @@ import org.jooq.impl.DefaultConfiguration;
 import org.jooq.tools.jdbc.Mock;
 import org.jooq.tools.jdbc.MockConnection;
 import org.jooq.tools.jdbc.MockDataProvider;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
@@ -25,6 +27,7 @@ class AssetsControllerTest {
     private DSLContext configCtx = DSL.using(new DefaultConfiguration());
 
     @Test
+    @DisplayName("Check that method getAsset return value with id 1")
     void getAsset_RightId_Success() throws ExecutionException, InterruptedException, IOException {
         //Arrange
         Map<String, String> attributes = new HashMap<>(3);
@@ -33,7 +36,7 @@ class AssetsControllerTest {
         attributes.put("Руководитель", "Богданов А.А.");
         Asset expectedAsset = new Asset(1, "Завод №1", null, attributes);
 
-        MockDataProvider provider = Mock.of(configCtx.fetchFromJSON(new String(Files.readAllBytes(ResourceUtils.getFile("classpath:get-asset-test.json").toPath()),"UTF-8")));
+        MockDataProvider provider = Mock.of(configCtx.fetchFromJSON(new String(Files.readAllBytes(ResourceUtils.getFile("classpath:get-asset-test.json").toPath()), "UTF-8")));
         DSLContext dsl = DSL.using(new MockConnection(provider));
 
         //Act
@@ -45,21 +48,5 @@ class AssetsControllerTest {
         //Assert
         assertThat(asset)
                 .isEqualToComparingFieldByFieldRecursively(expectedAsset);
-    }
-
-    @Test
-    void getSubTree() {
-    }
-
-    @Test
-    void addAsset() {
-    }
-
-    @Test
-    void updateAsset() {
-    }
-
-    @Test
-    void removeAsset() {
     }
 }

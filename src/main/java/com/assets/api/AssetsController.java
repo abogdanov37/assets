@@ -33,11 +33,11 @@ public class AssetsController {
 
     @RequestMapping(value = "/assets/{id}"
             , method = RequestMethod.GET
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     @Async
     public CompletableFuture<ResponseEntity<Asset>> getAsset(@PathVariable("id") long id) {
         CompletionStage<Result<Record>> result = context.select().from(Assets.ASSETS)
-                .join(Attributes.ATTRIBUTES)
+                .leftJoin(Attributes.ATTRIBUTES)
                 .on(Attributes.ATTRIBUTES.ASSETID.eq(Assets.ASSETS.ID))
                 .where(Assets.ASSETS.ID.eq(BigInteger.valueOf(id)))
                 .fetchAsync();
@@ -48,9 +48,11 @@ public class AssetsController {
                         records.get(0).getValue(Assets.ASSETS.PARENTID) != null
                                 ? records.get(0).getValue(Assets.ASSETS.PARENTID).longValue()
                                 : null,
-                        records.stream().collect(
-                                Collectors.toMap(r -> r.getValue(Attributes.ATTRIBUTES.NAME)
-                                        , r -> r.getValue(Attributes.ATTRIBUTES.VALUE))));
+                        records.stream()
+                                .filter(r -> r.getValue(Attributes.ATTRIBUTES.NAME) != null)
+                                .collect(Collectors.toMap(r -> r.getValue(Attributes.ATTRIBUTES.NAME)
+                                        , r -> r.getValue(Attributes.ATTRIBUTES.VALUE)))
+                );
                 return ResponseEntity.ok().body(asset);
             }
             return ResponseEntity.notFound().build();
@@ -59,7 +61,7 @@ public class AssetsController {
 
     @RequestMapping(value = "/assets/{id}/subtree"
             , method = RequestMethod.GET
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     public ResponseEntity<List<Asset>> getSubTree(@PathVariable("id") long id) {
         Result<Record> result = context
                 .fetch("WITH RECURSIVE tree(id, name, parentid) AS ( \n" +
@@ -107,7 +109,7 @@ public class AssetsController {
 
     @RequestMapping(value = "/assets"
             , method = RequestMethod.POST
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     public ResponseEntity addAsset(@RequestBody Asset asset) {
         context.transaction(configuration -> {
             DSL.using(configuration).insertInto(Assets.ASSETS, Assets.ASSETS.ID, Assets.ASSETS.NAME, Assets.ASSETS.PARENTID)
@@ -128,7 +130,7 @@ public class AssetsController {
 
     @RequestMapping(value = "/assets"
             , method = RequestMethod.PUT
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     public ResponseEntity updateAsset(@RequestBody Asset asset) {
         context.transaction(configuration -> {
             DSL.using(configuration).delete(Assets.ASSETS)
@@ -152,7 +154,7 @@ public class AssetsController {
 
     @RequestMapping(value = "/assets/{id}"
             , method = RequestMethod.DELETE
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     public ResponseEntity removeAsset(@PathVariable("id") long id) {
         int deleted = context.delete(Assets.ASSETS)
                 .where(Assets.ASSETS.ID.eq(BigInteger.valueOf(id)))
