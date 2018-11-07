@@ -3,20 +3,19 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.6.RELEASE")
         classpath 'com.h2database:h2:1.4.197'
 
         classpath 'com.sun.xml.bind:jaxb-core:2.3.0.1'
         classpath 'com.sun.xml.bind:jaxb-impl:2.3.0.1'
         classpath 'javax.activation:activation:1.1.1'
         classpath 'javax.xml.bind:jaxb-api:2.3.0'
-
     }
 }
 
 plugins {
     id 'nu.studer.jooq' version '3.0.2'
-    id "org.flywaydb.flyway" version "5.1.4"
+    id "org.flywaydb.flyway" version "5.2.1"
 }
 
 apply plugin: 'java'
@@ -27,7 +26,10 @@ apply plugin: 'io.spring.dependency-management'
 group 'Assets'
 version '1.0'
 
-sourceCompatibility = 1.9
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+sourceCompatibility = 1.10
 
 repositories {
     mavenCentral()
@@ -36,15 +38,27 @@ repositories {
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-jooq'
+    compile'org.springframework.boot:spring-boot-starter-log4j2'
     compile 'org.jooq:jooq'
     runtime 'com.h2database:h2:1.4.197'
-    testCompile 'junit:junit:4.12'
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testCompile 'org.junit.vintage:junit-vintage-engine:5.3.1'
+    testCompile 'org.assertj:assertj-core:3.11.1'
+    testCompile 'org.flywaydb:flyway-core:5.2.1'
 
     jooqRuntime 'com.h2database:h2:1.4.197'
     jooqRuntime 'javax.activation:activation:1.1.1'
     jooqRuntime 'javax.xml.bind:jaxb-api:2.3.0'
     jooqRuntime 'com.sun.xml.bind:jaxb-core:2.3.0.1'
     jooqRuntime 'com.sun.xml.bind:jaxb-impl:2.3.0.1'
+}
+
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 flyway {
@@ -98,4 +112,3 @@ task run(type: JavaExec) {
 }
 
 generateAssetsJooqSchemaSource.dependsOn flywayMigrate
-//test.dependsOn flywayClean

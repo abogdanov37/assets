@@ -25,7 +25,7 @@ public class AssetAttributesController {
 
     @RequestMapping(value = "/assets/{id}/attributes"
             , method = RequestMethod.GET
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     public ResponseEntity<Map<String, String>> getAllAttributes(@PathVariable("id") long id) {
         Result<Record> result = context.select().from(Attributes.ATTRIBUTES)
                 .where(Attributes.ATTRIBUTES.ASSETID.eq(BigInteger.valueOf(id)))
@@ -42,7 +42,7 @@ public class AssetAttributesController {
 
     @RequestMapping(value = "/assets/{id}/attributes/{name}"
             , method = RequestMethod.GET
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getAttributeByName(@PathVariable("id") long id, @PathVariable("name") String name) {
         Result<Record> result = context.select().from(Attributes.ATTRIBUTES)
                 .where(Attributes.ATTRIBUTES.ASSETID.eq(BigInteger.valueOf(id)))
@@ -56,7 +56,7 @@ public class AssetAttributesController {
 
     @RequestMapping(value = "/assets/{id}/attributes"
             , method = RequestMethod.POST
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     public ResponseEntity addAttributes(@PathVariable("id") long id, @RequestBody Map<String, String> attributes) {
         context.transaction(configuration -> {
             attributes.entrySet().forEach(e -> {
@@ -72,7 +72,7 @@ public class AssetAttributesController {
 
     @RequestMapping(value = "/assets/{id}/attributes/{name}"
             , method = RequestMethod.PUT
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     public ResponseEntity updateAttribute(@PathVariable("id") long id
             , @PathVariable("name") String name
             , @RequestBody String value) {
@@ -87,7 +87,7 @@ public class AssetAttributesController {
 
     @RequestMapping(value = "/assets/{id}/attributes/{name}"
             , method = RequestMethod.DELETE
-            , produces="application/json;charset=UTF-8")
+            , produces = "application/json;charset=UTF-8")
     public ResponseEntity removeAttribute(@PathVariable("id") long id, @PathVariable("name") String name) {
 
         int deleted = context.delete(Attributes.ATTRIBUTES)

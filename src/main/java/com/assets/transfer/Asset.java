@@ -1,6 +1,5 @@
 package com.assets.transfer;
 
-import java.util.Collections;
 import java.util.Map;
 
 public class Asset {
@@ -24,20 +23,20 @@ public class Asset {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Map<String, String> getAttributes() {
-        return attributes;
-    }
-
     public void setId(long id) {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Map<String, String> getAttributes() {
+        return attributes;
     }
 
     public void setAttributes(Map<String, String> attributes) {
