@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.6.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE")
         classpath 'com.h2database:h2:1.4.197'
 
         classpath 'com.sun.xml.bind:jaxb-core:2.3.0.1'
@@ -37,11 +37,22 @@ repositories {
 
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework.boot:spring-boot-starter-jooq'
-    compile'org.springframework.boot:spring-boot-starter-log4j2'
+    compile 'org.springframework.boot:spring-boot-starter-log4j2'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.jooq:jooq'
+
+    compile 'org.springframework.security.oauth:spring-security-oauth2:2.3.4.RELEASE'
+
+    runtime 'org.springframework.boot:spring-boot-devtools'
     runtime 'com.h2database:h2:1.4.197'
 
+    runtime 'javax.activation:activation:1.1.1'
+    runtime 'javax.xml.bind:jaxb-api:2.3.0'
+    runtime 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    runtime 'com.sun.xml.bind:jaxb-impl:2.3.0.1'
+    
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testCompile 'org.junit.vintage:junit-vintage-engine:5.3.1'

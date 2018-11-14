@@ -1,5 +1,6 @@
 package com.assets.api;
 
+import com.assets.api.interfaces.AssetsController;
 import com.assets.model.tables.Assets;
 import com.assets.model.tables.Attributes;
 import com.assets.transfer.Asset;
@@ -10,6 +11,8 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -21,21 +24,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
-
-@RestController
-public class AssetsController {
+@Component
+public class AssetsControllerImpl implements AssetsController {
     private final DSLContext context;
 
     @Autowired
-    public AssetsController(DSLContext ctx) {
+    public AssetsControllerImpl(DSLContext ctx) {
         context = ctx;
     }
 
-    @RequestMapping(value = "/assets/{id}"
-            , method = RequestMethod.GET
-            , produces = "application/json;charset=UTF-8")
-    @Async
-    public CompletableFuture<ResponseEntity<Asset>> getAsset(@PathVariable("id") long id) {
+    public CompletableFuture<ResponseEntity<Asset>> getAsset(long id) {
         CompletionStage<Result<Record>> result = context.select().from(Assets.ASSETS)
                 .leftJoin(Attributes.ATTRIBUTES)
                 .on(Attributes.ATTRIBUTES.ASSETID.eq(Assets.ASSETS.ID))
@@ -59,10 +57,7 @@ public class AssetsController {
         });
     }
 
-    @RequestMapping(value = "/assets/{id}/subtree"
-            , method = RequestMethod.GET
-            , produces = "application/json;charset=UTF-8")
-    public ResponseEntity<List<Asset>> getSubTree(@PathVariable("id") long id) {
+    public ResponseEntity<List<Asset>> getSubTree(long id) {
         Result<Record> result = context
                 .fetch("WITH RECURSIVE tree(id, name, parentid) AS ( \n" +
                         " SELECT a.id, a.name, a.parentid \n" +
@@ -99,39 +94,29 @@ public class AssetsController {
                     asset.getAttributes().put(r.getValue(Attributes.ATTRIBUTES.NAME), r.getValue(Attributes.ATTRIBUTES.VALUE));
                 }
             }
-            if (asset != null) {
-                body.add(asset);
-            }
+            body.add(asset);
             return ResponseEntity.ok().body(body);
         }
         return ResponseEntity.notFound().build();
     }
 
-    @RequestMapping(value = "/assets"
-            , method = RequestMethod.POST
-            , produces = "application/json;charset=UTF-8")
-    public ResponseEntity addAsset(@RequestBody Asset asset) {
+    public ResponseEntity addAsset(Asset asset) {
         context.transaction(configuration -> {
             DSL.using(configuration).insertInto(Assets.ASSETS, Assets.ASSETS.ID, Assets.ASSETS.NAME, Assets.ASSETS.PARENTID)
                     .values(BigInteger.valueOf(asset.getId()), asset.getName(), asset.getParentId() != null ? BigInteger.valueOf(asset.getParentId()) : null)
                     .execute();
 
-            asset.getAttributes().entrySet().forEach(e -> {
-                DSL.using(configuration)
-                        .insertInto(Attributes.ATTRIBUTES, Attributes.ATTRIBUTES.ASSETID, Attributes.ATTRIBUTES.NAME, Attributes.ATTRIBUTES.VALUE)
-                        .values(BigInteger.valueOf(asset.getId()), e.getKey(), e.getValue().toString())
-                        .execute();
-            });
+            asset.getAttributes().forEach((key, value) -> DSL.using(configuration)
+                    .insertInto(Attributes.ATTRIBUTES, Attributes.ATTRIBUTES.ASSETID, Attributes.ATTRIBUTES.NAME, Attributes.ATTRIBUTES.VALUE)
+                    .values(BigInteger.valueOf(asset.getId()), key, value)
+                    .execute());
 
         });
 
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/assets"
-            , method = RequestMethod.PUT
-            , produces = "application/json;charset=UTF-8")
-    public ResponseEntity updateAsset(@RequestBody Asset asset) {
+    public ResponseEntity updateAsset(Asset asset) {
         context.transaction(configuration -> {
             DSL.using(configuration).delete(Assets.ASSETS)
                     .where(Assets.ASSETS.ID.eq(BigInteger.valueOf(asset.getId())))
@@ -141,21 +126,16 @@ public class AssetsController {
                     .values(BigInteger.valueOf(asset.getId()), asset.getName(), asset.getParentId() != null ? BigInteger.valueOf(asset.getParentId()) : null)
                     .execute();
 
-            asset.getAttributes().entrySet().forEach(e -> {
-                DSL.using(configuration)
-                        .insertInto(Attributes.ATTRIBUTES, Attributes.ATTRIBUTES.ASSETID, Attributes.ATTRIBUTES.NAME, Attributes.ATTRIBUTES.VALUE)
-                        .values(BigInteger.valueOf(asset.getId()), e.getKey(), e.getValue().toString())
-                        .execute();
-            });
+            asset.getAttributes().forEach((key, value) -> DSL.using(configuration)
+                    .insertInto(Attributes.ATTRIBUTES, Attributes.ATTRIBUTES.ASSETID, Attributes.ATTRIBUTES.NAME, Attributes.ATTRIBUTES.VALUE)
+                    .values(BigInteger.valueOf(asset.getId()), key, value)
+                    .execute());
         });
 
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/assets/{id}"
-            , method = RequestMethod.DELETE
-            , produces = "application/json;charset=UTF-8")
-    public ResponseEntity removeAsset(@PathVariable("id") long id) {
+    public ResponseEntity removeAsset(long id) {
         int deleted = context.delete(Assets.ASSETS)
                 .where(Assets.ASSETS.ID.eq(BigInteger.valueOf(id)))
                 .execute();
