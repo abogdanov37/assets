@@ -1,6 +1,6 @@
 package com.assets.controller;
 
-import com.assets.api.AssetsController;
+import com.assets.api.interfaces.AssetsController;
 import com.assets.transfer.Asset;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

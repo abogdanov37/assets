@@ -1,6 +1,6 @@
 package com.assets.integration.api;
 
-import com.assets.api.AssetsController;
+import com.assets.api.interfaces.AssetsController;
 import com.assets.integration.configuration.DatabaseStructureSetup;
 import com.assets.integration.configuration.PersistanceTestConfiguration;
 import org.junit.Before;
